@@ -1,10 +1,195 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-<title>BR</title>
-<script type="text/javascript" charset="utf-8" src="cordova-2.1.0.js"></script>
-</head>
-<body>
-<h1>Aplicacion Business Rating</h1>
+<!DOCTYPE html> 
+<html> 
+<head> 
+    <title>BR</title> 
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, charset=utf-8"> 
+
+    <link rel="stylesheet" href="./libs/jquery.mobile-1.2.0.min.css" />
+    <script src="./libs/jquery-1.8.2.min.js"></script>
+    <script src="./libs/jquery.mobile-1.2.0.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="./libs/cordova-2.2.0.js"></script>
+    <script src="./libs/barcodescanner.js"></script>
+    <script src="./libs/geo.js"></script>
+    <script>
+    var idL;
+    var GPSlatitud;
+    var GPSlongitud;
+
+    // Función error al escenar BARCODE
+    function scanerror(error) {
+        alert("Fallo al escanear: " + error);
+    }
+    
+    // Función éxito al escanear BARCODE
+    function scansuccess(result) {
+        idL = result.text;
+        $('#idLocal').val(idL); // Asigna el valor al TextField del Formulario.
+        navigator.geolocation.getCurrentPosition(onSuccess, onError);
+    }
+    
+    // Acierto en la lectura GPS.
+    var onSuccess = function(position) {
+        GPSlatitud = position.coords.latitude;
+        GPSlongitud = position.coords.longitude;
+        //alert(GPSlatitud + ' ,' + GPSlongitud);
+    };
+
+    // Fallo en la lectura GPS.
+    function onError(error) {
+        alert('code: '    + error.code    + '\n' +
+              'message: ' + error.message + '\n');
+    };
+    
+    // Función para escanear código.
+    function scan() {    
+        window.plugins.barcodeScanner.scan(scansuccess, scanerror);
+    }
+    
+    </script>
+    
+</head> 
+
+<body> 
+<!-- Principal -->   
+<div data-role="page" id="mainpage">
+
+    <div data-role="header">
+        <h1>BR: Your best choice!</h1>
+    </div><!-- /header -->
+
+    <div data-role="content">   
+        <a href="#valoracion" data-rel="page" data-role="button" onclick="scan();">Realizar Valoración</a>
+    </div>
+    <div>
+        <a href="#popupOpciones" id ="botonPopUp" data-role="button" data-rel="popup">Sugerencia</a>
+    </div>
+    
+    <div data-role="popup" id="popupOpciones">
+                <div>Servicios</div>
+                <a href="#" id ="boton" data-role="button">Hoteles</a>
+                <a href="#" id ="boton" data-role="button">Restaurantes</a>
+                <a href="#" id ="boton" data-role="button">Compras</a>
+                <a href="#popupOpciones2" id ="boton" data-role="button" data-rel="popup">Otros</a>
+                <a href="#pagina2" id ="boton" data-role="button">Volver</a>
+            </div>
+            
+             <div data-role="popup" id="popupOpciones2">
+                <input type="text" name="search" placeholder="¿Servicios?"/>
+                <a href="#" id ="boton" data-role="button">Sugiéreme</a>
+                <a href="#popupOpciones" id ="boton" data-role="button" data-rel="popup">Volver</a>
+             </div>
+
+    <div data-role="footer">
+        <h4>GPL 2012</h4>
+    </div>
+</div>
+
+
+<!-- Valoración -->
+<div data-role="page" id="valoracion">
+    
+    <div data-role="none">
+
+        <form action="#" method="post" data-theme="c">
+            
+            <div>
+                <input type="text" name="ID Local" id="idLocal" value=""/>
+                
+            </div>
+            
+            <div data-role="fieldcontain">
+			    <fieldset data-role="controlgroup" data-type="horizontal">
+			        <legend>Servicio:</legend>
+			            <input type="radio" name="servicio" id="s1" value="1" />
+			            <label for="s1">1</label>
+			
+			            <input type="radio" name="servicio" id="s2" value="2"  />
+			            <label for="s2">2</label>
+			
+			            <input type="radio" name="servicio" id="s3" value="3"  />
+			            <label for="s3">3</label>
+			
+			            <input type="radio" name="servicio" id="s4" value="4"  />
+			            <label for="s4">4</label>
+			            
+			            <input type="radio" name="servicio" id="s5" value="5"  />
+                        <label for="s5">5</label>
+			    </fieldset>
+			</div>
+			<div data-role="fieldcontain">
+                <fieldset data-role="controlgroup" data-type="horizontal">
+                    <legend>Calidad del servicio:</legend>
+                        <input type="radio" name="calidad_servicio" id="cs1" value="1" />
+                        <label for="cs1">1</label>
+            
+                        <input type="radio" name="calidad_servicio" id="cs2" value="2"  />
+                        <label for="cs2">2</label>
+            
+                        <input type="radio" name="calidad_servicio" id="cs3" value="3"  />
+                        <label for="cs3">3</label>
+            
+                        <input type="radio" name="calidad_servicio" id="cs4" value="4"  />
+                        <label for="cs4">4</label>
+                        
+                        <input type="radio" name="calidad_servicio" id="cs5" value="5"  />
+                        <label for="cs5">5</label>
+                </fieldset>
+            </div>
+            <div data-role="fieldcontain">
+                <fieldset data-role="controlgroup" data-type="horizontal">
+                    <legend>Atención al cliente:</legend>
+                        <input type="radio" name="atencion_cliente" id="ac1" value="1" />
+                        <label for="ac1">1</label>
+            
+                        <input type="radio" name="atencion_cliente" id="ac2" value="2"  />
+                        <label for="ac2">2</label>
+            
+                        <input type="radio" name="atencion_cliente" id="ac3" value="3"  />
+                        <label for="ac3">3</label>
+            
+                        <input type="radio" name="atencion_cliente" id="ac4" value="4"  />
+                        <label for="ac4">4</label>
+                        
+                        <input type="radio" name="atencion_cliente" id="ac5" value="5"  />
+                        <label for="ac5">5</label>
+                </fieldset>
+            </div>
+		    <div data-role="fieldcontain">
+                <fieldset data-role="controlgroup" data-type="horizontal">
+                    <legend>Estado de las instalaciones:</legend>
+                        <input type="radio" name="estado_instalaciones" id="ei1" value="1" />
+                        <label for="ei1">1</label>
+            
+                        <input type="radio" name="atencion_cliente" id="ei2" value="2"  />
+                        <label for="ei2">2</label>
+            
+                        <input type="radio" name="atencion_cliente" id="ei3" value="3"  />
+                        <label for="ei3">3</label>
+            
+                        <input type="radio" name="atencion_cliente" id="ei4" value="4"  />
+                        <label for="ei4">4</label>
+                        
+                        <input type="radio" name="atencion_cliente" id="ei5" value="5"  />
+                        <label for="ei5">5</label>
+                </fieldset>
+            </div>
+		    
+            <div data-role="none">
+                <label for="comentario">Comentario:</label>
+	            <textarea name="textarea" id="comentario" style="width:100%">
+	            </textarea>
+            </div>
+            <div>
+                <input type="submit" value="Enviar" />
+            </div>
+        </form>
+    </div>
+    <div data-role="footer">
+        <h4>GPL 2012</h4>
+    </div><!-- /footer -->
+</div>
+
+
 </body>
 </html>
