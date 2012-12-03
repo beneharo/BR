@@ -5,12 +5,12 @@
     
     <meta name="viewport" content="width=device-width, initial-scale=1, charset=utf-8"> 
 
-    <link rel="stylesheet" href="./libs/jquery.mobile-1.2.0.min.css" />
-    <script src="./libs/jquery-1.8.2.min.js"></script>
-    <script src="./libs/jquery.mobile-1.2.0.min.js"></script>
-    <script type="text/javascript" charset="utf-8" src="./libs/cordova-2.2.0.js"></script>
-    <script src="./libs/barcodescanner.js"></script>
-    <script src="./libs/geo.js"></script>
+    <link rel="stylesheet" href="./js/jquery.mobile-1.2.0.min.css" />
+    <script src="./js/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/jquery.raty.min.js"></script>
+    <script src="./js/jquery.mobile-1.2.0.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="./js/cordova-2.2.0.js"></script>
+    <script src="./js/barcodescanner.js"></script>
     <script>
     var idL;
     var GPSlatitud;
@@ -46,6 +46,28 @@
         window.plugins.barcodeScanner.scan(scansuccess, scanerror);
     }
     
+    
+    
+    function enviarDatos(){
+        $.ajax({
+            async:  true, 
+            data:   {
+            	idLocal :  $('#idLocal').val(),
+            	servicio : $('#servicio').val(),
+            	calidad_servicio : $('#calidad_servicio').val(),
+            	atencion_cliente : $('#atencion_cliente').val(),
+            	estado_instalaciones : $('#estado_instalaciones').val(),
+            	email_usuario : $('#email_usuario').val(),
+            	comentario : $('#comentario').val()
+            },
+            url:    "http://iibr.vv.si/datos.php",
+            type:   "post",
+            dataType:"html",
+            success:
+         });
+
+    }
+    
     </script>
     
 </head> 
@@ -60,8 +82,6 @@
 
     <div data-role="content">   
         <a href="#valoracion" data-rel="page" data-role="button" onclick="scan();">Realizar Valoración</a>
-    </div>
-    <div>
         <a href="#popupOpciones" id ="botonPopUp" data-role="button" data-rel="popup">Sugerencia</a>
     </div>
     
@@ -90,98 +110,89 @@
 <div data-role="page" id="valoracion">
     
     <div data-role="none">
-
+ 
+	    <script type="text/javascript"> 
+	        $(function() { 
+	            $('#servicio').raty({ 
+	                cancel     : true, 
+	                cancelOff  : 'cancel-off-big.png', 
+	                cancelOn   : 'cancel-on-big.png',  
+	                size       : 24, 
+	                starOff    : 'star-off-big.png', 
+	                starOn     : 'star-on-big.png',
+	                click      : function(score) {
+			                	   $('#servicio').val(score);
+			                	 }
+	            }); 
+	            $('#calidad_servicio').raty({ 
+                    cancel     : true, 
+                    cancelOff  : 'cancel-off-big.png', 
+                    cancelOn   : 'cancel-on-big.png',  
+                    size       : 24, 
+                    starOff    : 'star-off-big.png', 
+                    starOn     : 'star-on-big.png',
+                    click      : function(score) {
+                                   $('#calidad_servicio').val(score);
+                                 }
+                });
+	            $('#atencion_cliente').raty({ 
+                    cancel     : true, 
+                    cancelOff  : 'cancel-off-big.png', 
+                    cancelOn   : 'cancel-on-big.png',  
+                    size       : 24, 
+                    starOff    : 'star-off-big.png', 
+                    starOn     : 'star-on-big.png',
+                    click      : function(score) {
+                                   $('#atencion_cliente').val(score);
+                                 }
+                });
+	            $('#estado_instalaciones').raty({ 
+                    cancel     : true, 
+                    cancelOff  : 'cancel-off-big.png', 
+                    cancelOn   : 'cancel-on-big.png',  
+                    size       : 24, 
+                    starOff    : 'star-off-big.png', 
+                    starOn     : 'star-on-big.png',
+                    click      : function(score) {
+                                   $('#estado_instalaciones').val(score);
+                                 }
+                }); 
+	        }); 
+	    </script>
+            
         <form action="#" method="post" data-theme="c">
             
-            <div>
-                <input type="text" name="ID Local" id="idLocal" value=""/>
-                
-            </div>
-            
             <div data-role="fieldcontain">
-			    <fieldset data-role="controlgroup" data-type="horizontal">
-			        <legend>Servicio:</legend>
-			            <input type="radio" name="servicio" id="s1" value="1" />
-			            <label for="s1">1</label>
-			
-			            <input type="radio" name="servicio" id="s2" value="2"  />
-			            <label for="s2">2</label>
-			
-			            <input type="radio" name="servicio" id="s3" value="3"  />
-			            <label for="s3">3</label>
-			
-			            <input type="radio" name="servicio" id="s4" value="4"  />
-			            <label for="s4">4</label>
-			            
-			            <input type="radio" name="servicio" id="s5" value="5"  />
-                        <label for="s5">5</label>
-			    </fieldset>
-			</div>
-			<div data-role="fieldcontain">
-                <fieldset data-role="controlgroup" data-type="horizontal">
-                    <legend>Calidad del servicio:</legend>
-                        <input type="radio" name="calidad_servicio" id="cs1" value="1" />
-                        <label for="cs1">1</label>
-            
-                        <input type="radio" name="calidad_servicio" id="cs2" value="2"  />
-                        <label for="cs2">2</label>
-            
-                        <input type="radio" name="calidad_servicio" id="cs3" value="3"  />
-                        <label for="cs3">3</label>
-            
-                        <input type="radio" name="calidad_servicio" id="cs4" value="4"  />
-                        <label for="cs4">4</label>
-                        
-                        <input type="radio" name="calidad_servicio" id="cs5" value="5"  />
-                        <label for="cs5">5</label>
-                </fieldset>
+                <input type="text" name="idLocal" id="idLocal" value=""/>
+            </div>
+
+            <div data-role="fieldcontain">
+                <legend>Servicio:</legend>
+                <div id="servicio" name="servicio" value=""></div>
             </div>
             <div data-role="fieldcontain">
-                <fieldset data-role="controlgroup" data-type="horizontal">
-                    <legend>Atención al cliente:</legend>
-                        <input type="radio" name="atencion_cliente" id="ac1" value="1" />
-                        <label for="ac1">1</label>
-            
-                        <input type="radio" name="atencion_cliente" id="ac2" value="2"  />
-                        <label for="ac2">2</label>
-            
-                        <input type="radio" name="atencion_cliente" id="ac3" value="3"  />
-                        <label for="ac3">3</label>
-            
-                        <input type="radio" name="atencion_cliente" id="ac4" value="4"  />
-                        <label for="ac4">4</label>
-                        
-                        <input type="radio" name="atencion_cliente" id="ac5" value="5"  />
-                        <label for="ac5">5</label>
-                </fieldset>
+                <legend>Calidad Servicio:</legend>
+                <div id="calidad_servicio" name="calidad_servicio" value=""></div>
             </div>
+            <div data-role="fieldcontain">
+                <legend>Calidad Servicio:</legend>
+                <div id="atencion_cliente" name="atencion_cliente" value=""></div>
+            </div>
+            <div data-role="fieldcontain">
+                <legend>Calidad Servicio:</legend>
+                <div id="estado_instalaciones" name="estado_instalaciones" value=""></div>
+            </div>
+
 		    <div data-role="fieldcontain">
-                <fieldset data-role="controlgroup" data-type="horizontal">
-                    <legend>Estado de las instalaciones:</legend>
-                        <input type="radio" name="estado_instalaciones" id="ei1" value="1" />
-                        <label for="ei1">1</label>
-            
-                        <input type="radio" name="atencion_cliente" id="ei2" value="2"  />
-                        <label for="ei2">2</label>
-            
-                        <input type="radio" name="atencion_cliente" id="ei3" value="3"  />
-                        <label for="ei3">3</label>
-            
-                        <input type="radio" name="atencion_cliente" id="ei4" value="4"  />
-                        <label for="ei4">4</label>
-                        
-                        <input type="radio" name="atencion_cliente" id="ei5" value="5"  />
-                        <label for="ei5">5</label>
-                </fieldset>
+                <legend>eMail usuario:</legend>
+                <input type="text" name="email_usuario" id="email_usuario" value=""/>
             </div>
-		    
-            <div data-role="none">
+            <div data-role="fieldcontain">
                 <label for="comentario">Comentario:</label>
-	            <textarea name="textarea" id="comentario" style="width:100%">
-	            </textarea>
+	            <textarea name="comentario" id="comentario" style="width:100%"></textarea>
             </div>
             <div>
-                <input type="submit" value="Enviar" />
+                <input type="submit" value="Enviar" onClick="enviarDatos()" />
             </div>
         </form>
     </div>
