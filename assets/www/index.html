@@ -10,7 +10,7 @@
     <script type="text/javascript" charset="utf-8" src="js/jquery.raty.min.js"></script>
     <script src="./js/jquery.mobile-1.2.0.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="./js/cordova-2.2.0.js"></script>
-    <script src="./js/barcodescanner.js"></script>
+    <script src="js/barcodescanner.js"></script>
     <script>
     var idL;
     var GPSlatitud;
@@ -46,8 +46,6 @@
         window.plugins.barcodeScanner.scan(scansuccess, scanerror);
     }
     
-    
-    
     function enviarDatos(){
         $.ajax({
             async:  true, 
@@ -62,8 +60,7 @@
             },
             url:    "http://iibr.vv.si/datos.php",
             type:   "post",
-            dataType:"html",
-            success:
+            dataType:"html"
          });
 
     }
@@ -80,8 +77,8 @@
         <h1>BR: Your best choice!</h1>
     </div><!-- /header -->
 
-    <div data-role="content">   
-        <a href="#valoracion" data-rel="page" data-role="button" onclick="scan();">Realizar Valoración</a>
+    <div data-role="content">     
+        <a href="#valoracion" data-rel="page" data-role="button" onclick="scan()">Realizar Valoración</a>
         <a href="#popupOpciones" id ="botonPopUp" data-role="button" data-rel="popup">Sugerencia</a>
     </div>
     
