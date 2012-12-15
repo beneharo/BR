@@ -4,7 +4,7 @@
     <title>BR</title> 
     
     <meta name="viewport" content="width=device-width, initial-scale=1, charset=utf-8"> 
-
+    <link rel="stylesheet" href="./js/loader.css" />
     <link rel="stylesheet" href="./js/jquery.mobile-1.2.0.min.css" />
     <script src="./js/jquery-1.8.2.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="js/jquery.raty.min.js"></script>
@@ -12,27 +12,43 @@
     <script type="text/javascript" charset="utf-8" src="./js/cordova-2.2.0.js"></script>
     <script src="js/barcodescanner.js"></script>
     <script>
+    var WEB = "http://iibr.vv.si/";
     var idL;
     var GPSlatitud;
     var GPSlongitud;
-
-    // Función error al escenar BARCODE
-    function scanerror(error) {
-        alert("Fallo al escanear: " + error);
-    }
+    var GPSlat;
+    var GPSlon;
+    var GPSerror = 0.03; // Margen de error GPS (30 m).
     
-    // Función éxito al escanear BARCODE
-    function scansuccess(result) {
-        idL = result.text;
-        $('#idLocal').val(idL); // Asigna el valor al TextField del Formulario.
+    document.addEventListener("deviceready", onDeviceReady, false);
+    // Cordova is ready      
+    function onDeviceReady() {
         navigator.geolocation.getCurrentPosition(onSuccess, onError);
     }
+    
+    // Convertir grados en radianes.
+    function toRad(value) {
+    	return parseFloat(value * Math.PI / 180);
+    }
+    
+    // Calcular distancia entre dos puntos GPS.
+    function haversine_km(lat1, lon1, lat2, lon2) {
+    	var R = 6371; // Radio Tierra km
+    	var dLat = toRad(lat2 - lat1);
+    	var dLon = toRad(lon2 - lon1);
+    	var lat1 = toRad(lat1);
+    	var lat2 = toRad(lat2);
+    	var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    	        Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2); 
+    	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    	var d = R * c;
+        return d;
+    };
     
     // Acierto en la lectura GPS.
     var onSuccess = function(position) {
         GPSlatitud = position.coords.latitude;
         GPSlongitud = position.coords.longitude;
-        //alert(GPSlatitud + ' ,' + GPSlongitud);
     };
 
     // Fallo en la lectura GPS.
@@ -48,9 +64,9 @@
     
     function enviarDatos(){
         $.ajax({
-            async:  true, 
+            async:  false, 
             data:   {
-            	idLocal :  $('#idLocal').val(),
+            	idLocal :  idL,
             	servicio : $('#servicio').val(),
             	calidad_servicio : $('#calidad_servicio').val(),
             	atencion_cliente : $('#atencion_cliente').val(),
@@ -62,14 +78,59 @@
             type:   "post",
             dataType:"html"
          });
-
     }
     
+    function recibirDatos() {
+    	$.ajax({
+            async:  false, 
+            data:   {
+                idLocal :  idL
+            },
+            url:        "http://iibr.vv.si/recibirDatos.php",
+            type:       "post",
+            dataType:   "json",
+            success:
+                function(jsondata){
+	            	var image = $('#logo');
+	            	image.attr("src", WEB + "" + jsondata[0].ruta_imagen);
+	            	$('#nombrenegocio').val(jsondata[0].nombre);
+	            	GPSlat = parseFloat(jsondata[0].gps_lat);
+	            	GPSlon = parseFloat(jsondata[0].gps_lon);
+                },
+            error: function() {
+                alert('Error. No se han podido recibir datos.');
+            }
+         });
+       
+    }
+    
+    // Función error al escenar BARCODE
+    function scanerror(error) {
+        alert("Fallo al escanear: " + error);
+    }
+    
+    // Función éxito al escanear BARCODE
+    function scansuccess(result) {
+        idL = result.text;
+        recibirDatos();
+        comprobarCoordenadas();        
+    }
+    
+    function comprobarCoordenadas() {
+    	if (haversine_km(GPSlatitud, GPSlongitud, GPSlat, GPSlon) <= GPSerror) {
+    		window.location.hash = "valoracion";
+    	} else {
+    		//alert("No estás en el sitio correcto.");
+    		//window.location.hash = "mainpage";
+    		window.location.hash = "valoracion";
+    	}
+    }
     </script>
     
 </head> 
 
-<body> 
+<body>
+
 <!-- Principal -->   
 <div data-role="page" id="mainpage">
 
@@ -78,7 +139,7 @@
     </div><!-- /header -->
 
     <div data-role="content">     
-        <a href="#valoracion" data-rel="page" data-role="button" onclick="scan()">Realizar Valoración</a>
+        <a href="#" data-rel="page" data-role="button" onclick="scan()">Realizar Valoración</a>
         <a href="#popupOpciones" id ="botonPopUp" data-role="button" data-rel="popup">Sugerencia</a>
     </div>
     
@@ -105,7 +166,21 @@
 
 <!-- Valoración -->
 <div data-role="page" id="valoracion">
-    
+    <div id="div_carga">
+                 <script type="text/javascript">
+                 $(function() { 
+	                 $('#div_carga')
+		                 .hide()
+		                 .ajaxStart(function() {
+		                     $(this).show();
+		                 })
+		                 .ajaxStop(function() {
+		                     $(this).hide();
+		                 });
+                 }); 
+                 </script>
+                 <img id="cargador" src="./images/ajax-loader.gif"/>
+    </div>
     <div data-role="none">
  
 	    <script type="text/javascript"> 
@@ -153,35 +228,38 @@
                     click      : function(score) {
                                    $('#estado_instalaciones').val(score);
                                  }
-                }); 
+                });
 	        }); 
 	    </script>
             
         <form action="#" method="post" data-theme="c">
             
             <div data-role="fieldcontain">
-                <input type="text" name="idLocal" id="idLocal" value=""/>
+                <input type="text" name="nombrenegocio" id="nombrenegocio" readonly value=""/>
             </div>
-
+            <div data-role="fieldcontain" align="center">
+                <a class="ui-link" href="">
+                    <img id="logo" src="">
+                </a>
+            </div>
             <div data-role="fieldcontain">
-                <legend>Servicio:</legend>
+                Servicio:
                 <div id="servicio" name="servicio" value=""></div>
             </div>
             <div data-role="fieldcontain">
-                <legend>Calidad Servicio:</legend>
+                Calidad Servicio:
                 <div id="calidad_servicio" name="calidad_servicio" value=""></div>
             </div>
             <div data-role="fieldcontain">
-                <legend>Calidad Servicio:</legend>
+                Atención Cliente:
                 <div id="atencion_cliente" name="atencion_cliente" value=""></div>
             </div>
             <div data-role="fieldcontain">
-                <legend>Calidad Servicio:</legend>
+                Estado de las Instalaciones:
                 <div id="estado_instalaciones" name="estado_instalaciones" value=""></div>
             </div>
-
 		    <div data-role="fieldcontain">
-                <legend>eMail usuario:</legend>
+                eMail usuario:
                 <input type="text" name="email_usuario" id="email_usuario" value=""/>
             </div>
             <div data-role="fieldcontain">
