@@ -4,13 +4,14 @@
     <title>BR</title> 
     
     <meta name="viewport" content="width=device-width, initial-scale=1, charset=utf-8"> 
-    <link rel="stylesheet" href="./js/loader.css" />
     <link rel="stylesheet" href="./js/jquery.mobile-1.2.0.min.css" />
     <script src="./js/jquery-1.8.2.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="js/jquery.raty.min.js"></script>
     <script src="./js/jquery.mobile-1.2.0.min.js"></script>
     <script type="text/javascript" charset="utf-8" src="./js/cordova-2.2.0.js"></script>
     <script src="js/barcodescanner.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/spin.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/spin.min.js"></script>
     <script>
     var WEB = "http://iibr.vv.si/";
     var idL;
@@ -21,7 +22,8 @@
     var GPSerror = 0.03; // Margen de error GPS (30 m).
     
     document.addEventListener("deviceready", onDeviceReady, false);
-    // Cordova is ready      
+    
+    // El programa está listo      
     function onDeviceReady() {
         navigator.geolocation.getCurrentPosition(onSuccess, onError);
     }
@@ -112,24 +114,31 @@
     // Función éxito al escanear BARCODE
     function scansuccess(result) {
         idL = result.text;
+        $('#cargando').show();
         recibirDatos();
-        comprobarCoordenadas();        
+        comprobarCoordenadas();
     }
     
     function comprobarCoordenadas() {
+    	// Si el usuario está dentro del perímetro permitido podrá
+    	// realizar la valoración. Si no, será redirigido a la pantalla principal.
     	if (haversine_km(GPSlatitud, GPSlongitud, GPSlat, GPSlon) <= GPSerror) {
     		window.location.hash = "valoracion";
     	} else {
+    		// ********************************************************
+    		// Para que funcione, descomentar las dos líneas siguientes
+    		// y comentar la tercera línea.
+    		// ********************************************************
     		//alert("No estás en el sitio correcto.");
     		//window.location.hash = "mainpage";
     		window.location.hash = "valoracion";
     	}
     }
     </script>
-    
 </head> 
 
 <body>
+<div id="cuerpo">
 
 <!-- Principal -->   
 <div data-role="page" id="mainpage">
@@ -137,7 +146,11 @@
     <div data-role="header">
         <h1>BR: Your best choice!</h1>
     </div><!-- /header -->
-
+    
+    <div id="cargando" style="display:none" align="center">
+        <img src="images/ajax-loader.gif" width="50" height="50"/>
+    </div>
+    
     <div data-role="content">     
         <a href="#" data-rel="page" data-role="button" onclick="scan()">Realizar Valoración</a>
         <a href="#popupOpciones" id ="botonPopUp" data-role="button" data-rel="popup">Sugerencia</a>
@@ -158,31 +171,15 @@
                 <a href="#popupOpciones" id ="boton" data-role="button" data-rel="popup">Volver</a>
              </div>
 
-    <div data-role="footer">
+    <div data-role="footer" data-position="fixed">
         <h4>GPL 2012</h4>
     </div>
 </div>
 
-
 <!-- Valoración -->
 <div data-role="page" id="valoracion">
-    <div id="div_carga">
-                 <script type="text/javascript">
-                 $(function() { 
-	                 $('#div_carga')
-		                 .hide()
-		                 .ajaxStart(function() {
-		                     $(this).show();
-		                 })
-		                 .ajaxStop(function() {
-		                     $(this).hide();
-		                 });
-                 }); 
-                 </script>
-                 <img id="cargador" src="./images/ajax-loader.gif"/>
-    </div>
+    
     <div data-role="none">
- 
 	    <script type="text/javascript"> 
 	        $(function() { 
 	            $('#servicio').raty({ 
@@ -276,6 +273,6 @@
     </div><!-- /footer -->
 </div>
 
-
+</div>
 </body>
 </html>
